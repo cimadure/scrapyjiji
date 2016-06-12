@@ -15,12 +15,12 @@ Take a look at the geocoder providers informations to know limits of each servic
 The map is generated using the [folium module](https://pypi.python.org/pypi/folium) with the default setting to use the openstreetmap tile.
 
 #### Prerequisites:
-Due to the scrapy limitation, this script only work on Python 2.
+This script only work on Python 3.
 
 **Packages requirements**:
-* scrapy v1.0.5
-* geocoder v1.9.0
-* folium v0.2.0
+* scrapy v1.1.0
+* geocoder v1.15.0
+* folium v0.2.1
 
 Each packages can be install using pip:
 ```
@@ -39,3 +39,4 @@ Open the generate map file in your browser:
 ```
 $ firefox map.html
 ```
+Released under the MIT License.
