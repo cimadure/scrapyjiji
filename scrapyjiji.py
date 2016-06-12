@@ -16,16 +16,27 @@ from scrapy import signals
 from scrapy.xlib.pydispatch import dispatcher
 
 # Settings
-MAP_LATLNG       = [46.810811, -71.215439] # your city latitude and longitude
-MAP_ZOOM         = 13 # default zoom
+
+MAP_ZOOM         = 13
 MIN_PRICE        = 0
-MAX_PRICE        = 950
-GREEN_PRICE      = 700
-BLUE_PRICE       = 800
-MAX_PAGE         = 3
-START_URL        = "http://www.kijiji.ca/b-appartement-condo/ville-de-quebec/c37l1700124?ad=offering&siteLocale=en_CA"
-LINKS_NEXT_PAGE  = "http://www.kijiji.ca/b-appartement-condo/ville-de-quebec"
-LINKS_TO_FOLLOW  = "http://www.kijiji.ca/v-appartement-condo-.*"
+MAX_PRICE        = 700
+GREEN_PRICE      = 400
+ORANGE_PRICE       = 550
+MAX_PAGE         = 10
+
+if False:
+    MAP_LATLNG       = [46.810811, -71.215439] # your city latitude and longitude
+    START_URL        = "http://www.kijiji.ca/b-appartement-condo/ville-de-quebec/c37l1700124?ad=offering&siteLocale=en_CA"
+    LINKS_NEXT_PAGE  = "http://www.kijiji.ca/b-appartement-condo/ville-de-quebec"
+    LINKS_TO_FOLLOW  = "http://www.kijiji.ca/v-appartement-condo-.*"
+else:
+    MAP_LATLNG       = [45.545046, -73.716665]# your city latitude and longitude
+    START_URL       = "http://www.kijiji.ca/b-chambres-a-louer-colocataire/grand-montreal/c36l80002?ad=offering&siteLocale=en_CA"
+    LINKS_NEXT_PAGE = "http://www.kijiji.ca/b-chambres-a-louer-colocataire/grand-montreal"
+    LINKS_TO_FOLLOW = "http://www.kijiji.ca/v-chambres-a-louer-colocataire/.*"
+
+#http://www.kijiji.ca/v-chambres-a-louer-colocataire/ville-de-montreal/transport-small-moving/1173170938?enableSearchNavigationFlag=true
+
 MAPQUEST_API_KEY = ""
 
 class Appartement(scrapy.Item):
@@ -42,6 +53,13 @@ class Kijiji(CrawlSpider):
     name = "kijiji"
     allowed_domains = ["kijiji.ca"]
     start_urls = ["%s&price=%d__%d" % (START_URL, MIN_PRICE, MAX_PRICE)]
+    #start_urls = START_URL
+
+    print(start_urls)
+#Other way : http://stackoverflow.com/questions/32624033/scrapy-crawl-with-next-page
+    # rules = (Rule(LinkExtractor(allow=(), restrict_xpaths=('//a[@title="Next"]',)), callback="parse_item", follow= True),)
+
+    #print(rules.)
     rules = [
         # Extract link
         Rule(
@@ -95,11 +113,11 @@ class Kijiji(CrawlSpider):
     def color_price(self, appartement):
         """Helper function to return a color for marker based on price"""
         price = float(appartement["price"][1:])
-        print price
+        print(price)
         if price < GREEN_PRICE:
             color = 'green'
-        elif price < BLUE_PRICE:
-            color = 'blue'
+        elif price < ORANGE_PRICE:
+            color = 'orange'
         else:
             color = 'red'
 
