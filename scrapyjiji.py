@@ -8,6 +8,7 @@ import scrapy
 import re
 import geocoder
 import folium
+import datetime
 
 from scrapy.crawler import CrawlerProcess
 from scrapy.spiders import CrawlSpider, Rule
@@ -16,6 +17,8 @@ from scrapy import signals
 from scrapy.xlib.pydispatch import dispatcher
 
 # Settings
+MAX_POST_DAYS = 15
+
 
 MAP_ZOOM         = 13
 MIN_PRICE        = 0
@@ -45,6 +48,11 @@ class Appartement(scrapy.Item):
     address = scrapy.Field()
     price = scrapy.Field()
     title = scrapy.Field()
+
+    description = scrapy.Field()
+    date_listed = scrapy.Field()
+    num_bathrooms = scrapy.Field()
+    #num_bedrooms = scrapy.Field()
 
 
 class Kijiji(CrawlSpider):
@@ -92,19 +100,42 @@ class Kijiji(CrawlSpider):
         appartement["price"] = self._extract_field(response, "Price")
         appartement["title"] = self._extract_title(response)
 
+        #    phone  http://stackoverflow.com/questions/6682503/click-a-button-in-scrapy
+
+
+        # from source :: https://github.com/mfournierca/kijiji_scraper/blob/master/kijiji_scraper/spiders/aptmnt_spider.py
+        appartement["date_listed"] = self._extract_field(response, "Date Listed")
+        appartement["num_bathrooms"] = self._extract_field(response, "Bathrooms (#)")
+        appartement["description"] = self._extract_description(response)
+        #appartement["num_bedrooms"] = self._extract_bedrooms(response)
+
+
         self.add_marker(appartement)
 
         return appartement
 
     def add_marker(self, appartement):
         """Helper function to add a marker on the map"""
-        folium.Marker(self.geocode(appartement),
-                      popup=self.popup(appartement),
-                      icon=folium.Icon(color=self.color_price(appartement))).add_to(self.m_map)
+        # folium.Marker(self.geocode(appartement),
+        #               popup=self.popup(appartement),
+        #               icon=folium.Icon(color=self.color_price(appartement)),
+        #               ).add_to(self.m_map)
+
+        folium.CircleMarker(location=self.geocode(appartement),
+                            popup=self.popup(appartement),
+                            radius=200,
+                            fill_color=self.color_price(appartement),
+                            fill_opacity=self.delta_ratio_day(date_in=appartement["date_listed"],
+                                                                    denum=MAX_POST_DAYS)).add_to(self.m_map)
 
     def popup(self, appartement):
         """Helper function to create a popup with appartement informations"""
-        html    = "<a href=%s target=_blank>%s<a/><br>%s" % (appartement["url"], appartement["title"], appartement["price"])
+        html = """{price}<br>
+                    <a href={url} target=_blank>{title}<a/>
+                    <br>{description}""".format(url=appartement["url"],
+                                                title=appartement["title"],
+                                                price=appartement["price"],
+                                                description=appartement["description"])
         iframe  = folium.element.IFrame(html=html, width=500, height=100)
         popup   = folium.Popup(iframe, max_width=500)
 
@@ -137,16 +168,38 @@ class Kijiji(CrawlSpider):
         else:
             return MAP_LATLNG
 
-    def _extract_title(self, response):
+    @staticmethod
+    def _extract_title(response):
         """Retrieve the title based on xpath"""
         l = " ".join(response.xpath("//h1/text()").extract())
         return l.strip() if l else None
 
-    def _extract_field(self, response, fieldname):
+    @staticmethod
+    def _extract_field(response, fieldname):
         """Retrieve the html field based on xpath"""
         l = response.xpath("//th[contains(text(), '{0}')]/following::td[1]//./text()".
                            format(fieldname)).extract()
         return l[0].strip() if l else None
+
+    @staticmethod
+    def _clean_string(string):
+        for i in [",", "\n", "\r", ";", "\\"]:
+            string = string.replace(i, "")
+        return string.strip()
+
+    def _extract_description(self, response):
+        l = " ".join(response.xpath("//span[@itemprop='description']/text()").extract())
+        return self._clean_string(l)
+
+#    def _extract_bedrooms(self, response):
+#        r = re.search(r'kijiji.ca\/v-(\d)-bedroom-apartments-condos', response.url)
+#        return r.group(1).strip() if r else None
+
+    @staticmethod
+    def delta_ratio_day(date_in, denum):
+        now = datetime.date.today()
+        i = datetime.datetime.strptime(date_in, "%d-%b-%y").date()
+        return 1-min(abs((now - i).days/denum), 1.0) # [0,1]
 
 
 # Entry point
