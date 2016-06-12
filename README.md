@@ -15,7 +15,7 @@ Take a look at the geocoder providers informations to know limits of each servic
 The map is generated using the [folium module](https://pypi.python.org/pypi/folium) with the default setting to use the openstreetmap tile.
 
 #### Prerequisites:
-This script only work on Python 3.
+This script works on Python 3.
 
 **Packages requirements**:
 * scrapy v1.1.0
