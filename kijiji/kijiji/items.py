@@ -13,4 +13,6 @@ class KijijiItem(scrapy.Item):
     title = scrapy.Field()
     href = scrapy.Field()
     description = scrapy.Field()
-
+    price = scrapy.Field()
+    latitude = scrapy.Field()
+    longitude = scrapy.Field()

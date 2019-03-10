@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import scrapy
 
-from kijiji.items import KijijiItem
+from kijiji.kijiji.items import KijijiItem
 from scrapy.crawler import CrawlerProcess
 
 
@@ -26,9 +26,9 @@ class KijijiSpider(scrapy.Spider):
             item['title'] = ad.css('a::text').extract_first()
             item['href'] = ad.css('a::attr(href)').extract_first()
 
-            request = response.follow(item['href'], self.parse_ad)
-            request.meta['item'] = item
-            yield request
+            #request =
+            #request.meta['item'] = item
+            yield response.follow(item['href'], callback=self.parse_ad, meta={'item': item})
 
         # follow pagination links
         #next_page = self._get_next_page(response)
@@ -41,11 +41,24 @@ class KijijiSpider(scrapy.Spider):
         return s.css('.page-link~ .prevnext-link ::attr(data-href)').extract_first()
 
     @staticmethod
-    def ad_id(s):
+    def _get_ad_id(s):
         return s.css('div ::attr(data-ad-id)').extract()
+
+    @staticmethod
+    def _get_price(s):
+        return s.css("span[class*='currentPrice'] ::text").extract_first()
+
+    @staticmethod
+    def _get_latitude(s):
+        return s.css("meta[property='og:latitude'] ::attr(content)").extract_first()
+
+    @staticmethod
+    def _get_longitude(s):
+        return s.css("meta[property='og:longitude'] ::attr(content)").extract_first()
 
     def parse_ad(self, response):
         item = response.meta['item']
         item['description'] = response.css('#vip-body div div div  div p').extract_first()
+        item['price'] = response.css('.currentPrice-* span').extract_first()
         yield item
 
