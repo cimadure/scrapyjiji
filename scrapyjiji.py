@@ -121,6 +121,8 @@ class Kijiji(CrawlSpider):
         #               icon=folium.Icon(color=self.color_price(appartement)),
         #               ).add_to(self.m_map)
 
+        print(appartement)
+
         folium.CircleMarker(location=self.geocode(appartement),
                             popup=self.popup(appartement),
                             radius=200,
