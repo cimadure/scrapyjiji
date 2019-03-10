@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import scrapy
 
-from kijiji.kijiji.items import KijijiItem
+from ..items import KijijiItem
 from scrapy.crawler import CrawlerProcess
 
 
@@ -22,12 +22,8 @@ class KijijiSpider(scrapy.Spider):
 
         for ad in response.css('div.title'):
             item = KijijiItem()
-
             item['title'] = ad.css('a::text').extract_first()
             item['href'] = ad.css('a::attr(href)').extract_first()
-
-            #request =
-            #request.meta['item'] = item
             yield response.follow(item['href'], callback=self.parse_ad, meta={'item': item})
 
         # follow pagination links
@@ -56,9 +52,17 @@ class KijijiSpider(scrapy.Spider):
     def _get_longitude(s):
         return s.css("meta[property='og:longitude'] ::attr(content)").extract_first()
 
+    @staticmethod
+    def _get_date_posted(s):
+        return s.css("div[class*='datePosted'] ::attr(datetime)").extract_first()
+
     def parse_ad(self, response):
         item = response.meta['item']
         item['description'] = response.css('#vip-body div div div  div p').extract_first()
-        item['price'] = response.css('.currentPrice-* span').extract_first()
+        item['price'] = self._get_price(response)
+        item['latitude'] = self._get_latitude(response)
+        item['longitude'] = self._get_longitude(response)
+        item['date_posted'] = self._get_date_posted(response)
         yield item
+
 

@@ -16,3 +16,4 @@ class KijijiItem(scrapy.Item):
     price = scrapy.Field()
     latitude = scrapy.Field()
     longitude = scrapy.Field()
+    date_posted = scrapy.Field()

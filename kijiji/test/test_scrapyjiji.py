@@ -48,6 +48,9 @@ class TestAd(unittest.TestCase):
     def test_location_longitude(self):
         self.assertEqual('-73.5849067', KijijiSpider._get_longitude(self.selector))
 
+    def test_date_posted(self):
+        self.assertEqual("2019-03-01T21:04:20.000Z", KijijiSpider._get_date_posted(self.selector))
+
 
 if __name__ == '__main__':
     unittest.main()
