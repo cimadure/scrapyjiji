@@ -18,15 +18,25 @@ df = df.dropna()
 app = dash.Dash(__name__)
 
 data = [go.Scattermapbox(
-    lat=list(df['latitude']),
-    lon=list(df['longitude']),
+    lat=df['latitude'],
+    lon=df['longitude'],
     mode='markers',
     marker=go.scattermapbox.Marker(size=8,
-                                   color='rgb(242, 177, 172)',
+                                   color='rgb(0, 0, 172)',
                                    opacity=0.7),
     text=df['price'],
-    hoverinfo='text'
-)]
+    hoverinfo='text'),
+
+    go.Scattermapbox(
+        lat=[45.5001806, 45.5071648],
+        lon=[-73.5674628, -73.5828495],
+        mode='markers',
+        marker=go.scattermapbox.Marker(size=12,
+                                       color='rgb(255, 0, 0)',
+                                       opacity=[1.0, 0.5]),
+        text=['Work', 'Gym'],
+        hoverinfo='text'),
+]
 
 layout = go.Layout(
     title='Kijiji Rooms',
@@ -36,7 +46,7 @@ layout = go.Layout(
     mapbox=go.layout.Mapbox(
         accesstoken=mapbox_access_token,
         bearing=0,
-        center=go.layout.mapbox.Center(lat=45.92, lon=-73.07),
+        center=go.layout.mapbox.Center(lat=45.5071648, lon=-73.5828495),
         pitch=1,
         zoom=10,
         style='light'
