@@ -6,8 +6,9 @@ dash==0.39.0  # The core dash backend
 dash-html-components==0.14.0  # HTML components
 dash-core-components==0.44.0  # Supercharged components
 dash-table==3.6.0  # Interactive DataTable component (new!)
+dash-renderer==0.20.0
 
-dash-renderer
-dash-auth
 
 pandas
+
+environs
