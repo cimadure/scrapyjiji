@@ -7,6 +7,21 @@ import pandas as pd
 import dash_core_components as dcc
 import dash_html_components as html
 import plotly.graph_objs as go
+import datetime
+from datetime import timedelta, date
+
+
+def relative_freshness(dates, relative=datetime.datetime.utcnow()):
+    ans = (relative - dates)
+    res = ans / (relative - max(dates))
+    return list(1 - min(res, 1.0))
+
+
+def delta_ratio_day(date_in, denum):
+    now = datetime.date.today()
+    i = datetime.datetime.strptime(date_in, "%d-%b-%y").date()
+    return 1 - min(abs((now - i).days / denum), 1.0)  # [0,1]
+
 
 env = Env()
 env.read_env()  # read .env file, if it exists
