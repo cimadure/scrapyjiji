@@ -67,6 +67,8 @@ ROBOTSTXT_OBEY = True
 ITEM_PIPELINES = {
     'kijiji.pipelines.KijijiPipeline': 300,
     'kijiji.pipelines.DuplicatesPipeline': 400,
+    'kijiji.pipelines.CleaningDataPipeline': 700,
+    'kijiji.pipelines.JsonWriterPipeline': 900,
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)

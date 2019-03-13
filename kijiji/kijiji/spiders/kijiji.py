@@ -12,10 +12,9 @@ class KijijiSpider(scrapy.Spider):
     def parse(self, response):
         for ad in response.css('div.search-item'):
             item = KijijiItem()
+            item['ad_id'] = ad.css('::attr(data-ad-id)').extract_first()
             item['title'] = ad.css('a::text').extract_first()
             item['href'] = ad.css('a::attr(href)').extract_first()
-
-            item['ad_id'] = ad.css('::attr(data-ad-id)').extract_first()
             yield response.follow(item['href'], callback=self.parse_ad, meta={'item': item})
 
         # follow pagination links
