@@ -8,7 +8,7 @@
 from scrapy.exceptions import DropItem
 
 
-class KijijiPipeline(object):
+class DuplicatesPipeline(object):
 
     def __init__(self):
         self.ids_seen = set()
@@ -19,3 +19,9 @@ class KijijiPipeline(object):
         else:
             self.ids_seen.add(item['ad_id'])
             return item
+
+
+class KijijiPipeline(object):
+
+    def process_item(self, item, spider):
+        return item
