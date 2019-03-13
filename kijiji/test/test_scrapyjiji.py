@@ -9,7 +9,7 @@ class TestPage(unittest.TestCase):
         # Selector(text='', type="html")
 
     def test_ad_id_numbers(self):
-        number_of_ads = sum(1 for _ in  KijijiSpider._get_ad_id(self.selector))
+        number_of_ads = sum(1 for _ in KijijiSpider._get_ad_id(self.selector))
         self.assertEqual(25, number_of_ads)
 
     def test_ad_id_first_item(self):

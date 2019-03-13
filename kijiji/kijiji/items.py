@@ -10,6 +10,7 @@ import scrapy
 
 class KijijiItem(scrapy.Item):
     # define the fields for your item here like:
+    ad_id = scrapy.Field()
     title = scrapy.Field()
     href = scrapy.Field()
     description = scrapy.Field()
